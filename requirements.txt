@@ -1,0 +1,19 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+requests
+
+# OCR (offline) - this step installs torch too, will take a while (~1-2GB download)
+easyocr
+imagehash
+Pillow
+
+# RAG (offline)
+sentence-transformers
+faiss-cpu
+numpy
+
+# Translation
+googletrans==4.0.0-rc1
+argostranslate

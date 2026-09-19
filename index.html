@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GreenGuard AI — Medicine Authenticity Verification</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 40 40" width="32" height="32">
+            <path d="M20 3 L34 9 V19 C34 28 28 34 20 37 C12 34 6 28 6 19 V9 Z" fill="none" stroke="currentColor" stroke-width="2.2"/>
+            <path d="M14 20 L18 24 L27 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <div class="brand-text">
+          <span class="brand-name">GreenGuard <em>AI</em></span>
+          <span class="brand-tag">Medicine Authenticity Registry</span>
+        </div>
+      </div>
+      <div id="modeIndicator" class="mode-pill">
+        <span id="modeDot" class="mode-dot"></span>
+        <span id="modeText">Checking connection…</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">SDG 3 &amp; SDG 12 · Health &amp; Responsible Consumption</p>
+        <h1>Every "natural" label deserves proof, not just trust.</h1>
+        <p class="hero-sub">Upload a photo of the packaging. GreenGuard cross-checks the batch code, license number, and logo against verified AYUSH &amp; FSSAI records, then issues a certification verdict — offline if it has to be.</p>
+      </div>
+
+      <div class="inspection-card">
+        <div class="viewfinder" id="dropZone">
+          <div class="corner tl"></div><div class="corner tr"></div>
+          <div class="corner bl"></div><div class="corner br"></div>
+          <div id="previewEmpty" class="preview-empty">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="7" width="18" height="13" rx="2"/>
+              <path d="M8 7 L9.5 4 h5 L16 7"/>
+              <circle cx="12" cy="13.5" r="3.3"/>
+            </svg>
+            <span>Place package photo here</span>
+          </div>
+          <img id="previewImg" class="preview-img hidden" alt="Uploaded package preview">
+        </div>
+
+        <input type="file" id="imageInput" accept="image/*" class="hidden">
+        <div class="inspection-actions">
+          <button id="chooseBtn" class="btn btn-ghost">Choose Photo</button>
+          <button id="scanBtn" class="btn btn-primary" disabled>Verify Authenticity</button>
+        </div>
+        <div id="scanLoading" class="hidden scan-loading">
+          <span class="spinner"></span> Cross-checking batch, license &amp; logo…
+        </div>
+      </div>
+    </section>
+
+    <section id="sealSection" class="hidden seal-section">
+      <div class="seal-wrap">
+        <div id="sealBadge" class="seal">
+          <svg class="seal-ring" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="90" fill="none" stroke-width="2.5" stroke-dasharray="4 6"/>
+            <circle cx="100" cy="100" r="78" fill="none" stroke-width="1.5"/>
+          </svg>
+          <div class="seal-center">
+            <span id="sealScore" class="seal-score">--</span>
+            <span class="seal-outof">/ 100</span>
+          </div>
+        </div>
+        <div class="seal-details">
+          <div id="verdictLabel" class="verdict-label">—</div>
+          <div id="matchedMedicine" class="matched-text"></div>
+          <ul id="reasonsList" class="reasons-list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard">
+      <div class="section-head">
+        <h2>Verification Ledger</h2>
+        <p>Aggregate view of every scan run through this registry.</p>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <span class="stat-value" id="statTotal">0</span>
+          <span class="stat-label">Total Scans</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="statAvg">0</span>
+          <span class="stat-label">Average Trust Score</span>
+        </div>
+        <div class="stat-card stat-flag">
+          <span class="stat-value" id="statFlagged">0</span>
+          <span class="stat-label">Flagged Counterfeit</span>
+        </div>
+      </div>
+
+      <div class="chart-row">
+        <div class="chart-card">
+          <h3>Verdict Distribution</h3>
+          <canvas id="verdictChart" height="220"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Trust Score Trend</h3>
+          <canvas id="trendChart" height="220"></canvas>
+        </div>
+      </div>
+
+      <div class="ledger-card">
+        <h3>Recent Entries</h3>
+        <div id="historyList" class="ledger-list">Loading…</div>
+      </div>
+    </section>
+
+    <section class="chat-section">
+      <div class="section-head">
+        <h2>Ask the Registry</h2>
+        <p>Grounded answers from verified medicine records — never a guess.</p>
+      </div>
+      <div class="chat-card">
+        <div id="chatWindow" class="chat-window">
+          <div class="chat-row ai">
+            <div class="chat-avatar">GR</div>
+            <div class="chat-bubble-ai">Ask me about any registered medicine — e.g. "Is Chyawanprash by Dabur genuine?"</div>
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <input type="text" id="chatInput" placeholder="Ask about a medicine, batch, or certification…">
+          <button id="chatSendBtn" class="btn btn-primary">Send</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    GreenGuard AI — Built for the 1M1B AI for Sustainability Internship (IBM SkillsBuild × AICTE)
+  </footer>
+
+  <script src="static/js/app.js"></script>
+</body>
+</html>
